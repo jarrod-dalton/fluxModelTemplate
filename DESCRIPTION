@@ -1,0 +1,19 @@
+Package: patientSimModelTemplate
+Type: Package
+Title: Template Package for patientSimCore Models
+Version: 0.1.0
+Authors@R:
+    person("Jarrod", "Dalton", role = c("aut", "cre"),
+           email = "jarrod@example.com")
+Description:
+    A blank template for developing disease- or domain-specific
+    patient-level simulation models on top of patientSimCore.
+    This package is intended to be copied/renamed; it includes
+    placeholder shells and a short guide pointing to patientSimCore.
+Depends:
+    patientSimCore (>= 0.10.0)
+Imports:
+    stats
+License: Proprietary
+Encoding: UTF-8
+LazyData: true
