@@ -18,12 +18,12 @@ replace the placeholder code in `R/` with your model logic.
 ## Documentation
 
 This template intentionally keeps package documentation minimal.
-Read `inst/MODEL_PACKAGE_GUIDE.md` and the `patientSimCore` documentation for details.
+Read `docs/MODEL_PACKAGE_GUIDE.md` and the `patientSimCore` documentation for details.
 
 
 ## Optional extensions
 
-See `inst/optional_extensions/` for commented walkthroughs on:
+See `docs/optional_extensions/` for commented walkthroughs on:
 
 - Bundle sources (terminology avoids the clinical meaning of "provider")
 - Composing multiple ModelBundles
