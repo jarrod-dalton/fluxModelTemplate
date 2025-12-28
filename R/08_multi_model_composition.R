@@ -11,6 +11,14 @@
 #   1) Namespaced state: state$ascvd$..., state$hospital$..., etc.
 #   2) model scope: core$model_active indicates which model(s) are “in scope”.
 #   3) explicit handoffs: events can flip scope and pass payload variables.
+#
+# Implementation note (how this maps to patientSimCore today):
+#   patientSimCore stores state variables in a flat schema. If you return a
+#   *namespaced* patch from transition(), patientSimCore flattens it using:
+#     "<namespace>__<var>"
+#   Example: list(ascvd=list(ldl=118)) -> updates variable "ascvd__ldl".
+#   The special namespace "core" preferentially maps to unprefixed schema
+#   variables (e.g., alive), and otherwise uses "core__<var>".
 
 # ------------------------------------------------------------------------------
 # 08.1 One canonical time axis, many model namespaces
