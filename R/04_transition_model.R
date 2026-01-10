@@ -6,7 +6,7 @@
 #
 # Inputs
 #   - patient: Patient R6 object
-#       * patient$time            current simulation time
+#       * patient$last_time            current simulation time
 #       * patient$state(name)     read a core state variable
 #       * patient$snapshot()      read core + derived variables (evaluated "now")
 #   - event: list-like event chosen by Engine
@@ -14,7 +14,7 @@
 #       * event$event_type
 #       * event$process_id
 #       * any additional metadata you attached in propose_events()
-#   - ctx: list-like context (time_unit, parameters, horizons, etc.)
+#   - ctx: list-like context (time unit, parameters, horizons, etc.)
 #
 # Output
 #   - A named *list* of scalar state updates (mixed types allowed), OR
@@ -56,7 +56,7 @@ transition_model <- function(patient, event, ctx) {
     # ---- Update age explicitly (if desired) --------------------------------
     # Decide whether age advances with time in your model.
     #
-    # dt <- event$time_next - patient$time
+    # dt <- event$time_next - patient$last_time
     # upd_age <- list(age = age + dt)
     
     # ---- Vectorized panel update example (BP) -------------------------------

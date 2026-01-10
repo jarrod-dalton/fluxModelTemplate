@@ -6,6 +6,7 @@
 # The schema is a named list: variable name -> variable descriptor.
 # Each variable descriptor must include:
 #   - default  : scalar default value
+#   - type     : one of {binary,categorical,ordinal,continuous,count}
 #
 # Optional fields recognized by patientSimCore:
 #   - coerce   : function(x) -> scalar

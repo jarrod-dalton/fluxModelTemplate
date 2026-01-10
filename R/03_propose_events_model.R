@@ -3,11 +3,11 @@
 #
 # Purpose
 #   Propose candidate future events across multiple processes that share one
-#   global time axis (same units as patient$time).
+#   global time axis (same units as patient$last_time).
 #
 # Inputs
 #   - patient: Patient R6 object
-#   - ctx: list-like context (time_unit, horizons, parameters, etc.)
+#   - ctx: list-like context (time unit, horizons, parameters, etc.)
 #
 # Output
 #   A named list of event candidates, one per process. Each candidate is a list
@@ -36,10 +36,10 @@
 #   - Keep this function lightweight; heavy computation belongs in transition().
 # ------------------------------------------------------------------------------
 propose_events_model <- function(patient, ctx) {
-  # Recommended: document your model's time unit in ctx$time_unit.
-  # Example: ctx$time_unit <- "years" or "months" or "days"
+  # Recommended: document your model's time unit in ctx$time$unit.
+  # Example: ctx$time$unit <- "years" or "months" or "days"
   #
-  # If you use a time horizon, put it in ctx (same units as patient$time):
+  # If you use a time horizon, put it in ctx (same units as patient$last_time):
   #   ctx$time_horizon
   
   # --------------------------------------------------------------------------
@@ -58,7 +58,7 @@ propose_events_model <- function(patient, ctx) {
   
   # Skeleton you can adapt:
   #
-  # t_now <- patient$time
+  # t_now <- patient$last_time
   #
   # ev_clinic <- list(
   #   time_next  = t_now + rexp(1, rate = 2),   # <-- replace with your logic

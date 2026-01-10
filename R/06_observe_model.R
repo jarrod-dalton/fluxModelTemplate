@@ -7,7 +7,7 @@
 #
 # Inputs
 #   - patient: Patient R6 object
-#       * patient$time            current simulation time
+#       * patient$last_time            current simulation time
 #       * patient$state(name)     read core state
 #       * patient$snapshot()      read core + derived variables (derived evaluated now)
 #   - event: realized event
@@ -48,7 +48,7 @@ observe_model <- function(patient, event, ctx) {
     # snap <- patient$snapshot()
     #
     # return(list(
-    #   time       = patient$time,
+    #   time       = patient$last_time,
     #   event_type = et,
     #   attended   = TRUE,              # or FALSE if you encode no-shows
     #   age        = snap$age,
@@ -67,7 +67,7 @@ observe_model <- function(patient, event, ctx) {
     # snap <- patient$snapshot()
     #
     # return(list(
-    #   time       = patient$time,
+    #   time       = patient$last_time,
     #   event_type = et,
     #   sodium     = snap$sodium,
     #   potassium  = snap$potassium,
@@ -83,7 +83,7 @@ observe_model <- function(patient, event, ctx) {
   if (et == "terminal_event") {
     
     # return(list(
-    #   time       = patient$time,
+    #   time       = patient$last_time,
     #   event_type = et
     # ))
     return(NULL)
