@@ -1,7 +1,7 @@
-Package: patientSimModelTemplate
+Package: fluxModelTemplate
 Type: Package
-Title: Template Package for patientSimCore Models
-Version: 1.4.0
+Title: Template Package for fluxCore Models
+Version: 1.5.0
 Author: Jarrod Dalton [aut, cre]
 Maintainer: Jarrod Dalton <daltonj@ccf.org>
 Authors@R: person(given = "Jarrod",
@@ -10,13 +10,13 @@ Authors@R: person(given = "Jarrod",
                   email = "daltonj@ccf.org")
 Description:
     A blank template for developing disease- or domain-specific
-    patient-level simulation models on top of patientSimCore.
+    entity-level simulation models on top of fluxCore.
     This package is intended to be copied/renamed; it includes
-    placeholder shells and a short guide pointing to patientSimCore.
-Depends:
-    patientSimCore (>= 0.10.0)
+    placeholder shells and a short guide pointing to fluxCore.
 Imports:
-    stats
-License: Proprietary
+    fluxCore (>= 1.5.0)
+License: Apache License (== 2.0)
 Encoding: UTF-8
 LazyData: true
+Suggests:
+    testthat (>= 3.0.0)

@@ -1,15 +1,15 @@
 # ------------------------------------------------------------------------------
-# observe_model(patient, event, ctx)   [optional]
+# observe_model(entity, event, ctx)   [optional]
 #
 # Purpose
 #   Emit observation rows for downstream analysis (visits, labs, risk estimates,
-#   utilization metrics, etc.) without mutating patient state.
+#   utilization metrics, etc.) without mutating entity state.
 #
 # Inputs
-#   - patient: Patient R6 object
-#       * patient$last_time            current simulation time
-#       * patient$state(name)     read core state
-#       * patient$snapshot()      read core + derived variables (derived evaluated now)
+#   - entity: Entity R6 object
+#       * entity$last_time            current simulation time
+#       * entity$state(name)     read core state
+#       * entity$snapshot()      read core + derived variables (derived evaluated now)
 #   - event: realized event
 #       * event$time_next
 #       * event$event_type
@@ -33,7 +33,7 @@
 #   - Risk score trajectories
 #   - Resource utilization summaries
 # ------------------------------------------------------------------------------
-observe_model <- function(patient, event, ctx) {
+observe_model <- function(entity, event, ctx) {
   
   # --------------------------------------------------------------------------
   # Recommended pattern: branch on event type
@@ -45,10 +45,10 @@ observe_model <- function(patient, event, ctx) {
   # --------------------------------------------------------------------------
   if (et == "clinic_visit") {
     
-    # snap <- patient$snapshot()
+    # snap <- entity$snapshot()
     #
     # return(list(
-    #   time       = patient$last_time,
+    #   time       = entity$last_time,
     #   event_type = et,
     #   attended   = TRUE,              # or FALSE if you encode no-shows
     #   age        = snap$age,
@@ -64,10 +64,10 @@ observe_model <- function(patient, event, ctx) {
   # --------------------------------------------------------------------------
   if (et == "bmp_draw") {
     
-    # snap <- patient$snapshot()
+    # snap <- entity$snapshot()
     #
     # return(list(
-    #   time       = patient$last_time,
+    #   time       = entity$last_time,
     #   event_type = et,
     #   sodium     = snap$sodium,
     #   potassium  = snap$potassium,
@@ -83,7 +83,7 @@ observe_model <- function(patient, event, ctx) {
   if (et == "terminal_event") {
     
     # return(list(
-    #   time       = patient$last_time,
+    #   time       = entity$last_time,
     #   event_type = et
     # ))
     return(NULL)

@@ -1,4 +1,4 @@
 library(testthat)
-library(patientSimModelTemplate)
+library(fluxModelTemplate)
 
-test_check("patientSimModelTemplate")
+test_check("fluxModelTemplate")

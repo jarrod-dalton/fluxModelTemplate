@@ -1,14 +1,14 @@
 # ------------------------------------------------------------------------------
-# transition_model(patient, event, ctx)
+# transition_model(entity, event, ctx)
 #
 # Purpose
 #   Apply the state transition associated with a realized event.
 #
 # Inputs
-#   - patient: Patient R6 object
-#       * patient$last_time            current simulation time
-#       * patient$state(name)     read a core state variable
-#       * patient$snapshot()      read core + derived variables (evaluated "now")
+#   - entity: Entity R6 object
+#       * entity$last_time            current simulation time
+#       * entity$state(name)     read a core state variable
+#       * entity$snapshot()      read core + derived variables (evaluated "now")
 #   - event: list-like event chosen by Engine
 #       * event$time_next
 #       * event$event_type
@@ -27,7 +27,7 @@
 #     using update_block() + combine_updates().
 #   - Returning NULL is valid and common (e.g., no-show events).
 # ------------------------------------------------------------------------------
-transition_model <- function(patient, event, ctx) {
+transition_model <- function(entity, event, ctx) {
   
   # --------------------------------------------------------------------------
   # Recommended pattern: branch on event type
@@ -40,7 +40,7 @@ transition_model <- function(patient, event, ctx) {
   if (et == "clinic_visit") {
     
     # ---- No-show pattern ----------------------------------------------------
-    # If the patient does not attend, return NULL.
+    # If the entity does not attend, return NULL.
     # The event is still recorded in the event log.
     #
     # p_no_show <- 0.1
@@ -49,14 +49,14 @@ transition_model <- function(patient, event, ctx) {
     # }
     
     # ---- Read current state -------------------------------------------------
-    # sbp <- patient$state("sbp")
-    # dbp <- patient$state("dbp")
-    # age <- patient$state("age")
+    # sbp <- entity$state("sbp")
+    # dbp <- entity$state("dbp")
+    # age <- entity$state("age")
     
     # ---- Update age explicitly (if desired) --------------------------------
     # Decide whether age advances with time in your model.
     #
-    # dt <- event$time_next - patient$last_time
+    # dt <- event$time_next - entity$last_time
     # upd_age <- list(age = age + dt)
     
     # ---- Vectorized panel update example (BP) -------------------------------
@@ -64,8 +64,8 @@ transition_model <- function(patient, event, ctx) {
     #
     # bp_pred <- list(sbp = 128, dbp = 82)   # <-- replace with your model
     #
-    # upd_bp <- patientSimCore::update_block(
-    #   patient,
+    # upd_bp <- fluxCore::update_block(
+    #   entity,
     #   block       = "bp",
     #   values      = bp_pred,
     #   require_all = TRUE,        # require all vars in block
@@ -73,7 +73,7 @@ transition_model <- function(patient, event, ctx) {
     # )
     
     # ---- Treatment decision example -----------------------------------------
-    # n_tx <- patient$state("n_antihypertensives")
+    # n_tx <- entity$state("n_antihypertensives")
     #
     # if (bp_pred$sbp > 130 || bp_pred$dbp > 80) {
     #   n_tx_new <- min(n_tx + 1L, 4L)
@@ -92,7 +92,7 @@ transition_model <- function(patient, event, ctx) {
     # )
     
     # ---- Combine updates safely ---------------------------------------------
-    # upd <- patientSimCore::combine_updates(
+    # upd <- fluxCore::combine_updates(
     #   upd_age,
     #   upd_bp,
     #   upd_tx,
@@ -110,7 +110,7 @@ transition_model <- function(patient, event, ctx) {
   if (et == "bmp_draw") {
     
     # ---- Read order time or other metadata ---------------------------------
-    # order_time <- patient$state("bmp_order_time")
+    # order_time <- entity$state("bmp_order_time")
     
     # ---- Generate lab values ------------------------------------------------
     # bmp_vals <- list(
@@ -120,8 +120,8 @@ transition_model <- function(patient, event, ctx) {
     #   glucose    = 95
     # )
     #
-    # upd_bmp <- patientSimCore::update_block(
-    #   patient,
+    # upd_bmp <- fluxCore::update_block(
+    #   entity,
     #   block  = "bmp",
     #   values = bmp_vals
     # )
@@ -129,7 +129,7 @@ transition_model <- function(patient, event, ctx) {
     # ---- Clear order state --------------------------------------------------
     # upd_clear <- list(bmp_order_time = NA_real_)
     
-    # return(patientSimCore::combine_updates(upd_bmp, upd_clear))
+    # return(fluxCore::combine_updates(upd_bmp, upd_clear))
     
     return(NULL)
   }

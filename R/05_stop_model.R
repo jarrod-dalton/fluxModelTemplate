@@ -1,11 +1,11 @@
 # ------------------------------------------------------------------------------
-# stop_model(patient, event, ctx)
+# stop_model(entity, event, ctx)
 #
 # Purpose
 #   Decide whether the simulation stops after the current event.
 #
 # Inputs
-#   - patient: Patient R6 object (use patient$state(...) and patient$last_time)
+#   - entity: Entity R6 object (use entity$state(...) and entity$last_time)
 #   - event: realized event (event_type, time_next, process_id, etc.)
 #   - ctx: context list (time_horizon, flags, etc.)
 #
@@ -14,13 +14,13 @@
 #
 # Common stop conditions
 #   1) A terminal event occurred (death, MI, transplant, etc.)
-#   2) A time horizon has been reached (patient$last_time >= ctx$time_horizon)
+#   2) A time horizon has been reached (entity$last_time >= ctx$time_horizon)
 #
 # Notes
-#   - Keep stop() deterministic given the realized event and patient state.
+#   - Keep stop() deterministic given the realized event and entity state.
 #   - Decide whether your horizon is inclusive or exclusive and be consistent.
 # ------------------------------------------------------------------------------
-stop_model <- function(patient, event, ctx) {
+stop_model <- function(entity, event, ctx) {
   
   # --------------------------------------------------------------------------
   # 1) Terminal event by event type
@@ -37,18 +37,18 @@ stop_model <- function(patient, event, ctx) {
   # Alternatively, stop if a state variable indicates terminal status.
   # This is useful when multiple event types map to a single terminal concept.
   # --------------------------------------------------------------------------
-  # if (isTRUE(patient$state("dead"))) {
+  # if (isTRUE(entity$state("dead"))) {
   #   return(TRUE)
   # }
   
   # --------------------------------------------------------------------------
   # 3) Time horizon
   #
-  # Put the horizon in ctx (same time units as patient$last_time).
+  # Put the horizon in ctx (same time units as entity$last_time).
   # Example: ctx$time_horizon <- 10  # (years)
   # --------------------------------------------------------------------------
   if (!is.null(ctx$time_horizon)) {
-    if (isTRUE(patient$last_time >= ctx$time_horizon)) {
+    if (isTRUE(entity$last_time >= ctx$time_horizon)) {
       return(TRUE)
     }
   }

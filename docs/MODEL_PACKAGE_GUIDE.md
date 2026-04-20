@@ -1,9 +1,9 @@
 # Model Package Guide (Template)
 
-This template is the canonical starting point for building a new disease model package that plugs into the **patientSim ecosystem**:
+This template is the canonical starting point for building a new disease model package that plugs into the **flux ecosystem**:
 
-- **patientSimCore**: simulation engine (patients, events, time, execution)
-- **patientSimForecast**: forward simulation + summaries (risk, survival, state summaries)
+- **fluxCore**: simulation engine (entities, events, time, execution)
+- **fluxForecast**: forward simulation + summaries (risk, survival, state summaries)
 - **Disease package (this one)**: *thin, declarative* model logic (schema, transitions, events)
 
 The guiding idea is: **Core owns the simulation truth**. Disease packages define model rules and defaults, but do not re-implement engine logic.
@@ -22,7 +22,7 @@ Top-level `README.md` remains the entry point; `docs/` is the “manual”.
 ## Build your model in this order
 
 1. `R/01_schema_model.R`  
-   Define the **patient schema** (required fields, defaults, blocks, and canonical variables like `alive`).
+   Define the **entity schema** (required fields, defaults, blocks, and canonical variables like `alive`).
 
 2. `R/02_derived_vars_model.R`  
    Define **derived variables** (computed from base state). Keep these deterministic and side-effect free.
@@ -34,7 +34,7 @@ Top-level `README.md` remains the entry point; `docs/` is the “manual”.
    Define how state updates occur when an event fires.
 
 5. `R/05_stop_model.R`  
-   Define stop logic (when the engine should stop running for a patient).
+   Define stop logic (when the engine should stop running for an entity).
 
 6. `R/06_observe_model.R`  
    Define what gets “observed” at requested times (if your model needs custom observation behavior).
@@ -62,7 +62,7 @@ See `docs/optional_extensions/03_forecast_integration.R` for examples of running
 - summary workflows that pool runs across parameter sets as posterior predictive draws
 
 For the math behind pooling and quantiles, see:
-- `patientSimForecast/docs/posterior_summary_math.md`
+- `fluxForecast/docs/posterior_summary_math.md`
 
 ## Optional extensions
 

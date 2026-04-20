@@ -56,11 +56,11 @@ hr { border: 0; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
 <main>
 <h1>Model Package Guide (Template)</h1>
 
-<p>This template is the canonical starting point for building a new disease model package that plugs into the <strong>patientSim ecosystem</strong>:</p>
+<p>This template is the canonical starting point for building a new disease model package that plugs into the <strong>flux ecosystem</strong>:</p>
 
 <ul>
-<li><strong>patientSimCore</strong>: simulation engine (patients, events, time, execution)</li>
-<li><strong>patientSimForecast</strong>: forward simulation + summaries (risk, survival, state summaries)</li>
+<li><strong>fluxCore</strong>: simulation engine (patients, events, time, execution)</li>
+<li><strong>fluxForecast</strong>: forward simulation + summaries (risk, survival, state summaries)</li>
 <li><strong>Disease package (this one)</strong>: <em>thin, declarative</em> model logic (schema, transitions, events)</li>
 </ul>
 
@@ -124,7 +124,7 @@ Assemble and export the <code>ModelBundle</code>.</p></li>
 </ul>
 
 <p>For the math behind pooling and quantiles, see:
-- <code>patientSimForecast/docs/posterior_summary_math.md</code></p>
+- <code>fluxForecast/docs/posterior_summary_math.md</code></p>
 
 <h2>Optional extensions</h2>
 

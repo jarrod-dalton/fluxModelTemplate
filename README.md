@@ -1,9 +1,9 @@
-# patientSimModelTemplate
+# fluxModelTemplate
 
 This is a **blank template** for building a model package that runs on top of
-**patientSimCore**.
+**fluxCore**.
 
-The intent is that you **copy/rename this repo** (e.g., to `patientSimCKD`) and then
+The intent is that you **copy/rename this repo** (e.g., to `fluxCKD`) and then
 replace the placeholder code in `R/` with your model logic.
 
 ## What you should edit first
@@ -18,7 +18,7 @@ replace the placeholder code in `R/` with your model logic.
 ## Documentation
 
 This template intentionally keeps package documentation minimal.
-Read `docs/MODEL_PACKAGE_GUIDE.md` and the `patientSimCore` documentation for details.
+Read `docs/MODEL_PACKAGE_GUIDE.md` and the `fluxCore` documentation for details.
 
 
 ## Optional extensions
@@ -27,4 +27,4 @@ See `docs/optional_extensions/` for commented walkthroughs on:
 
 - Bundle sources (terminology avoids the clinical meaning of "provider")
 - Composing multiple ModelBundles
-- Integrating patientSimForecast (including ctx list-of-lists patterns)
+- Integrating fluxForecast (including ctx list-of-lists patterns)

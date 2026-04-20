@@ -1,12 +1,12 @@
 # ------------------------------------------------------------------------------
-# propose_events_model(patient, ctx)
+# propose_events_model(entity, ctx)
 #
 # Purpose
 #   Propose candidate future events across multiple processes that share one
-#   global time axis (same units as patient$last_time).
+#   global time axis (same units as entity$last_time).
 #
 # Inputs
-#   - patient: Patient R6 object
+#   - entity: Entity R6 object
 #   - ctx: list-like context (time unit, horizons, parameters, etc.)
 #
 # Output
@@ -35,11 +35,11 @@
 #     to reduce work/noise.
 #   - Keep this function lightweight; heavy computation belongs in transition().
 # ------------------------------------------------------------------------------
-propose_events_model <- function(patient, ctx) {
+propose_events_model <- function(entity, ctx) {
   # Recommended: document your model's time unit in ctx$time$unit.
   # Example: ctx$time$unit <- "years" or "months" or "days"
   #
-  # If you use a time horizon, put it in ctx (same units as patient$last_time):
+  # If you use a time horizon, put it in ctx (same units as entity$last_time):
   #   ctx$time_horizon
   
   # --------------------------------------------------------------------------
@@ -58,7 +58,7 @@ propose_events_model <- function(patient, ctx) {
   
   # Skeleton you can adapt:
   #
-  # t_now <- patient$last_time
+  # t_now <- entity$last_time
   #
   # ev_clinic <- list(
   #   time_next  = t_now + rexp(1, rate = 2),   # <-- replace with your logic
@@ -67,7 +67,7 @@ propose_events_model <- function(patient, ctx) {
   # )
   #
   # # Encounter-driven lab: only propose if ordered
-  # bmp_order_time <- patient$state("bmp_order_time")  # may be NA
+  # bmp_order_time <- entity$state("bmp_order_time")  # may be NA
   # ev_bmp <- NULL
   # if (!is.na(bmp_order_time)) {
   #   ev_bmp <- list(
