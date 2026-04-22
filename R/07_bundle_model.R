@@ -39,7 +39,10 @@
 model_bundle <- function(params = list()) {
   init_entity <- function(entity, ctx) {
     # Example setup: register derived variable functions once per entity/run.
-    fluxCore::check_derived(entity, derived_vars_model(params), replace = FALSE)
+    dv <- derived_vars_model(params)
+    if (!is.null(dv) && length(dv) > 0L) {
+      fluxCore::check_derived(entity, dv, replace = FALSE)
+    }
     invisible(NULL)
   }
 
