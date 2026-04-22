@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# model_bundle(params = list())
+# model_bundle(params = list(), bundle_time_spec = model_time_spec())
 #
 # WHAT THIS FUNCTION IS
 #   model_bundle() is the "wiring function" for your model package.
@@ -8,6 +8,9 @@
 #
 # INPUTS
 #   params: optional parameter list passed through to your model helpers.
+#   bundle_time_spec: canonical time spec for the model.
+#     In practice, source this from one central declaration in your package
+#     (for example model_time_spec() that reads JSON config).
 #
 # OUTPUT
 #   A named list with hook functions and optional defaults.
@@ -31,12 +34,25 @@
 #   params is stored on the bundle so model defaults are available during runs.
 #   Core can propagate bundle$params into ctx$params if ctx$params is missing.
 #
+# WHY time_spec IS INCLUDED IN THE BUNDLE
+#   Even when canonical time is defined centrally (for example in JSON),
+#   Engine still needs an in-memory time_spec object at runtime.
+#   Current fluxCore contract expects bundle$time_spec, and Engine propagates it
+#   through run contexts. So: one central source of truth, attached here.
+#
 # WHAT TO EDIT
 #   Usually minimal edits:
 #   - keep function pointers aligned with your actual function names
 #   - include/remove optional hooks as needed
 # ------------------------------------------------------------------------------
-model_bundle <- function(params = list()) {
+model_bundle <- function(
+  params = list(),
+  bundle_time_spec = model_time_spec()
+) {
+  if (!inherits(bundle_time_spec, "time_spec")) {
+    stop("bundle_time_spec must be a fluxCore::time_spec(...) object.", call. = FALSE)
+  }
+
   init_entity <- function(entity, ctx) {
     # Example setup: register derived variable functions once per entity/run.
     dv <- derived_vars_model(params)
@@ -48,6 +64,7 @@ model_bundle <- function(params = list()) {
 
   list(
     params = params,                         # default model parameters
+    time_spec = bundle_time_spec,            # canonical model time declaration
     init_entity = init_entity,               # optional one-time setup
     propose_events = propose_events_model,   # required
     transition = transition_model,           # required

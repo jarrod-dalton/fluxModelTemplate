@@ -49,22 +49,19 @@ This lets you model systems where updates happen at uneven times while still hav
 
 ## First step: set a model time unit
 
-Set your model time unit at run-time before you start writing model logic.
+Set your model time unit once in the package config JSON
+(`inst/model_config/time_spec.json`) before you start writing model logic.
 For the urban food delivery example, use **hours**.
 
 Recommended pattern:
 
 ```r
-# pass time_unit directly to run_cohort()
-out <- fluxCore::run_cohort(
-  engine = eng,
-  entities = entities,
-  time_unit = "hours"
-)
+# model_bundle() reads canonical time via model_time_spec() from JSON
+bundle <- model_bundle()
 ```
 
-`fluxCore` currently propagates this into internal context for compatibility,
-but model-facing guidance should treat `time_unit` as the primary input.
+`fluxCore` will propagate canonical time metadata into run contexts internally;
+model-facing code should not pass runtime time-unit overrides.
 
 ## Tiny example problem used in comments
 

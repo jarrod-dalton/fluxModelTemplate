@@ -1,6 +1,13 @@
 test_that("Template exports exist", {
   expect_true(is.function(model_schema))
   expect_true(is.function(model_bundle))
+  expect_true(is.function(model_time_spec))
+})
+
+test_that("model_time_spec reads canonical JSON config", {
+  ts <- model_time_spec()
+  expect_true(inherits(ts, "time_spec"))
+  expect_identical(ts$unit, "hours")
 })
 
 test_that("model_schema returns a default-compatible schema", {
@@ -12,6 +19,7 @@ test_that("model_schema returns a default-compatible schema", {
 test_that("model_bundle exposes required hooks", {
   b <- model_bundle()
   expect_true(is.list(b))
+  expect_true(inherits(b$time_spec, "time_spec"))
   expect_true(is.function(b$propose_events))
   expect_true(is.function(b$transition))
   expect_true(is.function(b$stop))
@@ -43,7 +51,7 @@ test_that("minimal run path works without editing optional derived vars scaffold
   )
 
   expect_no_error({
-    out <- eng$run(e, max_events = 5, ctx = list(time = list(unit = "hours")))
+    out <- eng$run(e, max_events = 5)
     expect_true(is.list(out))
     expect_true(nrow(out$events) >= 2L) # init + at least one realized event
   })

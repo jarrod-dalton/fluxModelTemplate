@@ -1,5 +1,10 @@
 ## 1.6.0
 
+- Added canonical model-time configuration via
+  `inst/model_config/time_spec.json` and new `model_time_spec()` accessor.
+- Updated `model_bundle()` default wiring to source canonical time from
+  `model_time_spec()` while still attaching `bundle$time_spec` for Engine
+  runtime contract compatibility.
 - Rewrote staged template scripts (`R/01_...07_`) for stronger alignment with the current flux ecosystem contracts.
 - Shifted teaching examples to domain-neutral operational scenarios (urban delivery operations) to reduce conceptual drift.
 - Consolidated onboarding guidance into `README.md` as the single primary walkthrough.
