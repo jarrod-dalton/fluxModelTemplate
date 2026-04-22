@@ -1,30 +1,116 @@
 # fluxModelTemplate
 
-This is a **blank template** for building a model package that runs on top of
-**fluxCore**.
+`fluxModelTemplate` is a starter scaffold for building a new model package on top of `fluxCore`.
 
-The intent is that you **copy/rename this repo** (e.g., to `fluxCKD`) and then
-replace the placeholder code in `R/` with your model logic.
+This template is intentionally simple:
 
-## What you should edit first
+- each required function scaffold exists and runs with safe defaults
+- worked example logic is commented so you can fill it in safely
+- comments explain what each function takes and must return
 
-1. `R/01_schema_model.R` — define your model's *core state* and block membership.
-2. `R/07_bundle_model.R` — wires your functions into a ModelBundle.
-3. `R/03_propose_events_model.R` — propose event candidates across processes.
-4. `R/04_transition_model.R` — apply state transitions (return named list or NULL).
-5. `R/05_stop_model.R` — stop conditions.
-6. `R/06_observe_model.R` (optional) — emit observation rows.
+## Major framework components
 
-## Documentation
+A flux model package has a small number of structural pieces:
 
-This template intentionally keeps package documentation minimal.
-Read `docs/MODEL_PACKAGE_GUIDE.md` and the `fluxCore` documentation for details.
+- **State schema**: defines core variables that represent the evolving system state.
+- **Event proposal**: proposes future candidate events on one or more processes.
+- **Transition logic**: updates core state when an event is realized.
+- **Stop logic**: decides when simulation ends.
+- **Observation logic (optional)**: emits row-like outputs for analysis.
+- **Derived variables (optional)**: computed summaries of state/history at snapshot time.
+- **Bundle**: wires those functions into one object used by `fluxCore::Engine`.
 
+Template mapping:
 
-## Optional extensions
+- `R/01_schema_model.R` -> state schema
+- `R/03_propose_events_model.R` -> event proposal
+- `R/04_transition_model.R` -> transition logic
+- `R/05_stop_model.R` -> stop logic
+- `R/06_observe_model.R` -> observation logic (optional)
+- `R/02_derived_vars_model.R` -> derived variables (optional)
+- `R/07_bundle_model.R` -> model bundle
 
-See `docs/optional_extensions/` for commented walkthroughs on:
+## State variables vs derived variables
 
-- Bundle sources (terminology avoids the clinical meaning of "provider")
-- Composing multiple ModelBundles
-- Integrating fluxForecast (including ctx list-of-lists patterns)
+- **State variables** are the model's canonical evolving values. They are updated by `transition_model()`.
+- **Derived variables** are computed views of state/history. They are not written by transitions; they are functions evaluated at snapshot time.
+
+In short: transitions mutate core state; derived functions summarize it.
+
+## Event index `j` vs time `t`
+
+Flux models are event-driven with irregular time gaps.
+
+- `j` indexes event order (`j = 0, 1, 2, ...`).
+- `t` is simulation time on your chosen scale (hours, days, years, etc.).
+- Events are ordered by `j`, but event times `t_j` are generally irregular.
+
+This lets you model systems where updates happen at uneven times while still having a clear event sequence.
+
+## First step: set a model time unit
+
+Set your model time unit at run-time before you start writing model logic.
+For the urban food delivery example, use **hours**.
+
+Recommended pattern:
+
+```r
+# pass time_unit directly to run_cohort()
+out <- fluxCore::run_cohort(
+  engine = eng,
+  entities = entities,
+  time_unit = "hours"
+)
+```
+
+`fluxCore` currently propagates this into internal context for compatibility,
+but model-facing guidance should treat `time_unit` as the primary input.
+
+## Tiny example problem used in comments
+
+The inline comments use a small **urban food delivery operations** example as a teaching device.
+Replace it with your own domain.
+
+Example state variables:
+
+- `route_zone`: where the courier is operating (for example, urban/suburban/rural).
+- `battery_pct`: current battery level of the delivery vehicle.
+- `payload_kg`: current package load being carried.
+- `dispatch_mode`: current workflow state (idle, assigned, in transit, completed).
+
+Example event types:
+
+- `dispatch_check`: a dispatch decision point where assignment/reassignment can occur.
+- `delivery_completed`: a drop-off completion event.
+- `end_shift`: optional stop event for end-of-simulation scenarios.
+
+Example behavior:
+
+- `propose_events_model()` proposes candidate future events.
+- `transition_model()` applies state updates when an event occurs.
+- `stop_model()` decides whether simulation should stop.
+- `observe_model()` optionally emits row-like output for analysis.
+
+## Build order
+
+Edit in this order:
+
+1. `R/01_schema_model.R`
+2. `R/03_propose_events_model.R`
+3. `R/04_transition_model.R`
+4. `R/05_stop_model.R`
+5. `R/07_bundle_model.R`
+6. `R/02_derived_vars_model.R` (optional)
+7. `R/06_observe_model.R` (optional)
+
+## Why scripts contain live code
+
+The function shells are runnable on purpose (safe defaults) so the package can load/test immediately.
+Worked examples inside those shells are commented on purpose; uncomment/adapt them as you build your model.
+
+- `propose_events_model()` starts as `list()`
+- `transition_model()` starts as `NULL`
+- `stop_model()` starts as `FALSE` (unless you add a rule)
+- `observe_model()` starts as `NULL`
+
+That gives you a clean starting point while you replace placeholders with real model logic.

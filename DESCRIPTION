@@ -9,7 +9,7 @@ Authors@R: person(given = "Jarrod",
                   role = c("aut", "cre"),
                   email = "daltonj@ccf.org")
 Description:
-    A blank template for developing disease- or domain-specific
+    A staged template for developing domain-specific
     entity-level simulation models on top of fluxCore.
     This package is intended to be copied/renamed; it includes
     placeholder shells and a short guide pointing to fluxCore.

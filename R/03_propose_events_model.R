@@ -1,99 +1,65 @@
 # ------------------------------------------------------------------------------
 # propose_events_model(entity, ctx)
 #
-# Purpose
-#   Propose candidate future events across multiple processes that share one
-#   global time axis (same units as entity$last_time).
+# PURPOSE
+#   Propose candidate future events for the current state.
 #
-# Inputs
-#   - entity: Entity R6 object
-#   - ctx: list-like context (time unit, horizons, parameters, etc.)
+# INPUTS
+#   entity: current entity object (for example entity$last_time, entity$state(...)).
+#   ctx: run context list (optional settings/parameters/time controls).
 #
-# Output
-#   A named list of event candidates, one per process. Each candidate is a list
-#   that must include:
-#     - time_next  (numeric scalar)
-#     - event_type (character scalar)
-#     - process_id (character scalar)
+# OUTPUT
+#   Named list of candidate event objects.
 #
-#   You may add additional metadata fields to the event object; Engine will pass
-#   the entire event to transition().
+#   Each candidate should contain at least:
+#     - time_next: numeric event time t_next
+#     - event_type: string label handled by transition/stop/observe logic
+#     - process_id: process label (used to distinguish event streams)
 #
-# Example
-#   list(
-#     clinic = list(time_next=t1, event_type="clinic_visit", process_id="clinic"),
-#     labs   = list(time_next=t2, event_type="lab_draw",     process_id="labs")
-#   )
+# EVENT INDEX AND TIME
+#   This function proposes candidates for the *next* event index (j + 1), but
+#   does so in continuous/irregular time by setting time_next values.
 #
-# Notes / Patterns
-#   - Return NULL for a process if no event is currently pending.
-#   - "Encounter-driven" labs pattern:
-#       * transition() sets an order time in state (e.g., bmp_order_time)
-#       * propose_events() only proposes a lab draw if order time is not NA
-#       * transition() clears the order time when the draw occurs
-#   - You can choose to avoid proposing events beyond a horizon (ctx$time_horizon)
-#     to reduce work/noise.
-#   - Keep this function lightweight; heavy computation belongs in transition().
+# WHAT TO EDIT
+#   1) Add one candidate block per process.
+#   2) Build candidates from current state/context.
+#   3) Return named list of candidates.
+#
+# STOCHASTIC TIMING NOTE
+#   In most models, event times should be stochastic (not fixed offsets).
+#   A common pattern is:
+#     waiting_time ~ rexp(rate = lambda(state, params))
+#   where lambda can come from a model-based hazard/rate (for example a GLM-like
+#   predictor mapped through exp()).
 # ------------------------------------------------------------------------------
 propose_events_model <- function(entity, ctx) {
-  # Recommended: document your model's time unit in ctx$time$unit.
-  # Example: ctx$time$unit <- "years" or "months" or "days"
-  #
-  # If you use a time horizon, put it in ctx (same units as entity$last_time):
-  #   ctx$time_horizon
-  
-  # --------------------------------------------------------------------------
-  # TODO: Define your processes (each process proposes its next event)
-  #
-  # Common process archetypes:
-  #   - clinic scheduling process
-  #   - lab draw processes (only if ordered)
-  #   - disease progression process
-  #   - terminal event process
-  # --------------------------------------------------------------------------
-  
-  # Example placeholder: return an empty set of candidates (Engine will stop)
-  # In a real model you would propose at least one process, usually "clinic".
-  list()
-  
-  # Skeleton you can adapt:
-  #
+  # Worked example (commented, stochastic):
   # t_now <- entity$last_time
   #
-  # ev_clinic <- list(
-  #   time_next  = t_now + rexp(1, rate = 2),   # <-- replace with your logic
-  #   event_type = "clinic_visit",
-  #   process_id = "clinic"
+  # # Example: dispatch intensity from a GLM-like linear predictor
+  # payload <- entity$state("payload_kg")
+  # battery <- entity$state("battery_pct")
+  # lp_dispatch <- -0.8 + 0.03 * payload - 0.01 * battery
+  # rate_dispatch <- exp(lp_dispatch)              # must be > 0
+  # wait_dispatch <- rexp(1, rate = rate_dispatch)
+  #
+  # # Example: delivery completion intensity (could be process-specific)
+  # lp_delivery <- -0.3 + 0.015 * battery
+  # rate_delivery <- exp(lp_delivery)
+  # wait_delivery <- rexp(1, rate = rate_delivery)
+  #
+  # ev_dispatch <- list(
+  #   time_next = t_now + wait_dispatch,
+  #   event_type = "dispatch_check",
+  #   process_id = "dispatch"
   # )
-  #
-  # # Encounter-driven lab: only propose if ordered
-  # bmp_order_time <- entity$state("bmp_order_time")  # may be NA
-  # ev_bmp <- NULL
-  # if (!is.na(bmp_order_time)) {
-  #   ev_bmp <- list(
-  #     time_next  = bmp_order_time,
-  #     event_type = "bmp_draw",
-  #     process_id = "bmp"
-  #   )
-  # }
-  #
-  # # Terminal event: propose always (or only if not already terminal)
-  # ev_term <- list(
-  #   time_next  = t_now + rexp(1, rate = 0.05),
-  #   event_type = "terminal_event",
-  #   process_id = "terminal"
+  # ev_delivery <- list(
+  #   time_next = t_now + wait_delivery,
+  #   event_type = "delivery_completed",
+  #   process_id = "delivery"
   # )
-  #
-  # candidates <- list(clinic = ev_clinic, bmp = ev_bmp, terminal = ev_term)
-  #
-  # # Optional: horizon trimming
-  # if (!is.null(ctx$time_horizon)) {
-  #   candidates <- lapply(candidates, function(ev) {
-  #     if (is.null(ev)) return(NULL)
-  #     if (isTRUE(ev$time_next > ctx$time_horizon)) return(NULL)
-  #     ev
-  #   })
-  # }
-  #
-  # candidates
+  # list(dispatch = ev_dispatch, delivery = ev_delivery)
+
+  # Default scaffold behavior: no candidates.
+  list()
 }

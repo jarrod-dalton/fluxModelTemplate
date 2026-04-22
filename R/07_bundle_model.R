@@ -1,55 +1,54 @@
 # ------------------------------------------------------------------------------
 # model_bundle(params = list())
 #
-# Construct the ModelBundle consumed by fluxCore::Engine.
+# WHAT THIS FUNCTION IS
+#   model_bundle() is the "wiring function" for your model package.
+#   It returns one list object (ModelBundle) that tells fluxCore::Engine
+#   which functions to call for simulation behavior.
 #
-# A ModelBundle is a named list of functions with these signatures:
-#   - propose_events(entity, ctx)
-#   - transition(entity, event, ctx)
-#   - stop(entity, event, ctx)
-#   - (optional) observe(entity, event, ctx)
-#   - (optional) init_entity(entity, ctx)
+# INPUTS
+#   params: optional parameter list passed through to your model helpers.
 #
-# Why have a bundle constructor at all?
-#   This is the cleanest place to:
-#     - validate and freeze model parameters (params)
-#     - register derived variables once (via init_entity)
-#     - avoid globals by keeping params in the bundle
+# OUTPUT
+#   A named list with hook functions and optional defaults.
 #
-# Derived variables
-#   - Derived variables are NOT core state. They are computed at snapshot time.
-#   - In this template, derived vars are defined in R/derived_vars_model.R.
-#   - fluxCore::Engine will call init_entity(entity, ctx) once at the
-#     start of each run (if provided). We use that hook to register derived vars
-#     by name via fluxCore::check_derived().
+# RUNTIME CALL ORDER (mental model)
+#   For each entity in Engine$run():
+#     1) init_entity(entity, ctx)            # optional one-time setup
+#     2) propose_events(entity, ctx)         # propose candidate next events
+#     3) transition(entity, event, ctx)      # return state updates
+#     4) entity$update(...)                  # Core applies updates internally
+#     5) observe(entity, event, ctx)         # optional output row
+#     6) stop(entity, event, ctx)            # stop/continue decision
+#     7) loop until stop/max_events/max_time
 #
-# Parameters
-#   - fluxCore::Engine normalizes ctx once per run:
-#       * ctx is always a list (NULL -> list())
-#       * ctx$params always exists and is a list
-#       * if ctx$params is missing, Engine can default it from bundle$params
-#   - Therefore, downstream model code can consistently do:
-#       p <- ctx$params
+# WHY init_entity EXISTS
+#   init_entity is for per-run setup, not baseline state input.
+#   Baseline state values come from Entity$new(..., init = ...) / new_entity(...).
+#   Common init_entity use: register derived variables once before event loop.
+#
+# ABOUT params IN THE BUNDLE
+#   params is stored on the bundle so model defaults are available during runs.
+#   Core can propagate bundle$params into ctx$params if ctx$params is missing.
+#
+# WHAT TO EDIT
+#   Usually minimal edits:
+#   - keep function pointers aligned with your actual function names
+#   - include/remove optional hooks as needed
 # ------------------------------------------------------------------------------
 model_bundle <- function(params = list()) {
-  
-  # Optional: validate params here (fail fast)
-  # if (!is.numeric(params$visit_rate) || params$visit_rate <= 0) stop("visit_rate must be > 0")
-  
   init_entity <- function(entity, ctx) {
-    # Register derived variables once. Idempotent by name.
+    # Example setup: register derived variable functions once per entity/run.
     fluxCore::check_derived(entity, derived_vars_model(params), replace = FALSE)
     invisible(NULL)
   }
-  
+
   list(
-    # Optional defaults for ctx$params (Engine will use these if ctx$params not provided)
-    params        = params,
-    
-    init_entity  = init_entity,
-    propose_events = propose_events_model,
-    transition     = transition_model,
-    stop           = stop_model,
-    observe        = observe_model
+    params = params,                         # default model parameters
+    init_entity = init_entity,               # optional one-time setup
+    propose_events = propose_events_model,   # required
+    transition = transition_model,           # required
+    stop = stop_model,                       # required
+    observe = observe_model                  # optional
   )
 }

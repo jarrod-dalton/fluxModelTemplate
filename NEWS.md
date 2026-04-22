@@ -1,3 +1,12 @@
+## 1.6.0
+
+- Rewrote staged template scripts (`R/01_...07_`) for stronger alignment with the current flux ecosystem contracts.
+- Shifted teaching examples to domain-neutral operational scenarios (urban delivery operations) to reduce conceptual drift.
+- Consolidated onboarding guidance into `README.md` as the single primary walkthrough.
+- Removed legacy guide artifacts (`docs/MODEL_PACKAGE_GUIDE.*`) and old template snippet files.
+- Removed `docs/optional_extensions/` and package `man/` files to keep the template focused on minimal starter scaffolding.
+- Expanded template unit tests to check schema and bundle-hook scaffolding more explicitly.
+
 ## 1.5.0
 
 - Packaging contract cleanup for template consumers: dependency declarations updated and testthat Suggests declared.

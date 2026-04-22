@@ -1,116 +1,93 @@
 # ------------------------------------------------------------------------------
 # model_schema()
 #
-# Define your model's *core state* schema for fluxCore.
+# PURPOSE
+#   Define the core state schema for your model.
 #
-# The schema is a named list: variable name -> variable descriptor.
-# Each variable descriptor must include:
-#   - default  : scalar default value
-#   - type     : one of {binary,categorical,ordinal,continuous,count}
+# WHAT A "STATE SCHEMA" IS
+#   A state schema is the contract for your model's core state variables:
+#   - which variables exist
+#   - what type each variable is
+#   - default values
+#   - coercion/validation rules
+#   - optional block membership for grouped updates
 #
-# Optional fields recognized by fluxCore:
-#   - coerce   : function(x) -> scalar
-#   - validate : function(x) -> TRUE/FALSE
-#   - required : TRUE/FALSE (require value in init at entity creation)
-#   - blocks   : character vector of panel membership (for update_block)
+# INPUTS
+#   None.
 #
-# Full spec: fluxCore/inst/SCHEMA_SPEC.md
+# OUTPUT
+#   A named list. Each entry defines one variable, and together they define
+#   your full set of core state variables.
+#
+# ABOUT fluxCore::default_entity_schema()
+#   This provides a minimal base schema from Core so every new model starts from
+#   a valid foundation (for example, canonical fields like alive status).
+#   You then add model-specific variables on top.
+#
+# VARIABLE DEFINITION SHAPE
+#   schema$var_name <- list(
+#     type = "continuous",  # one of: binary/categorical/ordinal/continuous/count
+#     default = 0,
+#     coerce = as.numeric,
+#     validate = function(x) ...,  # returns TRUE/FALSE
+#     required = FALSE,            # if TRUE, must be present at initialization
+#     blocks = NULL                # optional grouping label(s) for joint updates
+#   )
+#
+# WHAT TO EDIT
+#   1) Keep `schema <- fluxCore::default_entity_schema()`.
+#   2) Add your variables below.
+#   3) Use strict validation to catch invalid inputs early.
 # ------------------------------------------------------------------------------
 model_schema <- function() {
   schema <- fluxCore::default_entity_schema()
-  
+
   # --------------------------------------------------------------------------
-  # EXAMPLE: Required demographics
-  #
-  # A common pattern is to require age/sex at entity creation so models
-  # fail fast and assumptions remain explicit.
+  # Worked example (urban food delivery): route context
   # --------------------------------------------------------------------------
-  schema$age <- list(
-    type     = "continuous",
-    default  = NA_real_,
-    coerce   = as.numeric,
-    validate = function(x) length(x) == 1L && !is.na(x) && is.finite(x) && x >= 0,
-    required = TRUE
-  )
-  
-  schema$sex <- list(
-    type     = "categorical",
-    levels   = c("F", "M"),
-    default  = NA_character_,
-    coerce   = as.character,
-    validate = function(x) length(x) == 1L && x %in% c("F", "M"),
-    required = TRUE
-  )
-  
-  # --------------------------------------------------------------------------
-  # EXAMPLE: A correlated measurement panel (block)
-  #
-  # Blocks are used to validate and package multi-variable updates.
-  # Variables can belong to multiple blocks (many-to-many).
-  # --------------------------------------------------------------------------
-  schema$sbp <- list(
-    type     = "continuous",
-    default  = 120,
-    coerce   = as.numeric,
-    validate = function(x) length(x) == 1L && is.finite(x) && x > 50 && x < 300,
-    blocks   = "bp"
-  )
-  
-  schema$dbp <- list(
-    type     = "continuous",
-    default  = 80,
-    coerce   = as.numeric,
-    validate = function(x) length(x) == 1L && is.finite(x) && x > 30 && x < 200,
-    blocks   = "bp"
-  )
-  
-  # Later, your transition can update BP atomically via:
-  #   upd_bp <- fluxCore::update_block(entity, "bp", list(sbp=125, dbp=82))
-  #   return(fluxCore::combine_updates(other_updates, upd_bp))
-  
-  # --------------------------------------------------------------------------
-  # EXAMPLE: Ordinal treatment intensity (integer cap)
-  # --------------------------------------------------------------------------
-  schema$n_antihypertensives <- list(
-    type     = "count",
-    default  = 0L,
-    coerce   = as.integer,
-    validate = function(x) length(x) == 1L && !is.na(x) && x >= 0L && x <= 4L,
-    blocks   = "tx_htn"
-  )
-  
-  # --------------------------------------------------------------------------
-  # EXAMPLE: Ordered category stored as character (simple)
-  # If you later want an ordered factor, implement that in coerce().
-  # --------------------------------------------------------------------------
-  schema$statin_intensity <- list(
-    type     = "ordinal",
-    levels   = c("none", "moderate", "high"),
-    default  = "none",
-    coerce   = as.character,
-    validate = function(x) length(x) == 1L && x %in% c("none", "moderate", "high"),
-    blocks   = "tx_lipid"
-  )
-  
-  # --------------------------------------------------------------------------
-  # EXAMPLE: Operational ordering state (encounter-driven labs)
-  # --------------------------------------------------------------------------
-  schema$bmp_order_time <- list(
-    type     = "continuous",
-    default  = NA_real_,
-    coerce   = as.numeric,
-    validate = function(x) length(x) == 1L && (is.na(x) || is.finite(x))
-  )
-  
-  # --------------------------------------------------------------------------
-  # TODO: Add your model-specific variables below
-  #
-  # schema$my_var <- list(
-  #   default  = 0,
-  #   coerce   = as.numeric,
-  #   validate = function(x) length(x) == 1L && is.finite(x)
+  # schema$route_zone <- list(
+  #   type = "categorical",
+  #   levels = c("urban", "suburban", "rural"),
+  #   default = "urban",
+  #   coerce = as.character,
+  #   validate = function(x) length(x) == 1L && x %in% c("urban", "suburban", "rural"),
+  #   required = TRUE
   # )
+
   # --------------------------------------------------------------------------
-  
+  # Worked example (urban food delivery): grouped vehicle state
+  #
+  # battery_pct and payload_kg share block "vehicle_status" so they can be
+  # updated together with update_block(...) inside transition_model().
+  # --------------------------------------------------------------------------
+  # schema$battery_pct <- list(
+  #   type = "continuous",
+  #   default = 100,
+  #   coerce = as.numeric,
+  #   validate = function(x) length(x) == 1L && is.finite(x) && x >= 0 && x <= 100,
+  #   blocks = "vehicle_status"
+  # )
+  #
+  # schema$payload_kg <- list(
+  #   type = "continuous",
+  #   default = 0,
+  #   coerce = as.numeric,
+  #   validate = function(x) length(x) == 1L && is.finite(x) && x >= 0,
+  #   blocks = "vehicle_status"
+  # )
+
+  # --------------------------------------------------------------------------
+  # Worked example (urban food delivery): workflow mode
+  # --------------------------------------------------------------------------
+  # schema$dispatch_mode <- list(
+  #   type = "ordinal",
+  #   levels = c("idle", "assigned", "in_transit", "completed"),
+  #   default = "idle",
+  #   coerce = as.character,
+  #   validate = function(x) {
+  #     length(x) == 1L && x %in% c("idle", "assigned", "in_transit", "completed")
+  #   }
+  # )
+
   schema
 }
