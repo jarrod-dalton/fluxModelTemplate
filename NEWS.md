@@ -1,3 +1,10 @@
+## 1.7.0
+
+- Coordinated ecosystem release alignment to version 1.7.0.
+- Dependency floor updated to `fluxCore (>= 1.7.0)`.
+- Retains 1.6.0 JSON-backed canonical model-time config
+  (`inst/model_config/time_spec.json` + `model_time_spec()` wiring).
+
 ## 1.6.0
 
 - Added canonical model-time configuration via
