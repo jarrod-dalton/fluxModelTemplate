@@ -1,3 +1,14 @@
+## 1.8.1
+
+- Converted staged template scripts into runnable defaults while preserving
+  instructional comments.
+- Activated the urban-delivery worked example across schema, event proposal,
+  transition, stop, observe, and derived-variable scaffolds.
+- Expanded template tests to validate end-to-end run behavior with the default
+  bundle wiring and derived-variable output checks.
+- Added optional `refresh_rules` guidance in bundle scaffolding and README,
+  with safe default behavior still documented as refresh-all.
+
 ## 1.8.0
 
 - Refreshed template onboarding scripts to better explain lifecycle semantics,
