@@ -1,3 +1,11 @@
+## 1.8.0
+
+- Refreshed template onboarding scripts to better explain lifecycle semantics,
+  event contracts, and where model-time declarations belong in bundle wiring.
+- Updated template guidance and examples to align with current core/forecast
+  lifecycle fallback behavior.
+- Added README release/download badges.
+
 ## 1.7.0
 
 - Coordinated ecosystem release alignment to version 1.7.0.
