@@ -28,17 +28,26 @@
 # RUNTIME CALL ORDER (mental model)
 #   For each entity in Engine$run():
 #     1) init_entity(entity, ctx)            # optional one-time setup
-#     2) propose_events(entity, ctx)         # propose candidate next events
+#     2) propose_events(entity, ctx, ...)    # propose candidate next events
 #     3) transition(entity, event, ctx)      # return state updates
 #     4) entity$update(...)                  # Core applies updates internally
 #     5) observe(entity, event, ctx)         # optional output row
 #     6) stop(entity, event, ctx)            # stop/continue decision
-#     7) loop until stop/max_events/max_time
+#     7) refresh_rules(...)                  # optional process refresh selection
+#     8) loop until stop/max_events/max_time
 #
 # WHY init_entity EXISTS
 #   init_entity is for per-run setup, not baseline state input.
 #   Baseline state values come from Entity$new(..., init = ...) / new_entity(...).
 #   Common init_entity use: register derived variables once before event loop.
+#
+# OPTIONAL refresh_rules
+#   You may provide refresh_rules(entity, last_event, changes, ctx) to refresh only
+#   selected process clocks after each realized event.
+#   If refresh_rules is omitted, fluxCore defaults to "ALL" (refresh all process clocks).
+#   If implemented, return:
+#     - "ALL" (exact scalar), or
+#     - character vector of unique process_id values (for targeted refresh).
 #
 # ABOUT params IN THE BUNDLE
 #   params is stored on the bundle so model defaults are available during runs.
@@ -63,6 +72,26 @@ model_bundle <- function(
     stop("bundle_time_spec must be a fluxCore::time_spec(...) object.", call. = FALSE)
   }
 
+  default_params <- list(
+    # Proposal rates/horizon
+    dispatch_rate_base = 0.7,
+    delivery_rate_base = 1.0,
+    dispatch_idle_multiplier = 1.2,
+    delivery_payload_scale = 0.15,
+    shift_length_hours = 8,
+    # Transition distributions
+    dispatch_payload_mean_kg = 3.0,
+    dispatch_payload_sdlog = 0.35,
+    dispatch_battery_drop_mean = 2.5,
+    delivery_payload_mean_kg = 1.2,
+    delivery_payload_sdlog = 0.45,
+    delivery_battery_drop_mean = 4.0,
+    # Derived variable threshold
+    low_battery_cutoff = 20
+  )
+
+  params <- utils::modifyList(default_params, params)
+
   init_entity <- function(entity, ctx) {
     # Example setup: register derived variable functions once per entity/run.
     dv <- derived_vars_model(params)
@@ -71,6 +100,17 @@ model_bundle <- function(
     }
     invisible(NULL)
   }
+
+  # Optional advanced hook:
+  # refresh_rules <- function(entity, last_event, changes, ctx) {
+  #   # Safe fallback:
+  #   # return("ALL")
+  #   #
+  #   # Example targeted refresh (only if dependency logic is well-defined):
+  #   # if ("battery_pct" %in% names(changes)) return(c("dispatch", "delivery"))
+  #   # character(0)
+  #   "ALL"
+  # }
 
   list(
     params = params,                         # default model parameters
@@ -82,5 +122,6 @@ model_bundle <- function(
     transition = transition_model,           # required
     stop = stop_model,                       # required
     observe = observe_model                  # optional
+    # refresh_rules = refresh_rules          # optional advanced hook
   )
 }

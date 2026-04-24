@@ -25,27 +25,75 @@
 #   3) Return named update list (or NULL).
 # ------------------------------------------------------------------------------
 transition_model <- function(entity, event, ctx) {
-  # Worked example (commented):
-  # if (identical(event$event_type, "dispatch_check")) {
-  #   # Stochastic assignment load (kg), e.g., from a lognormal model.
-  #   new_payload <- as.numeric(rlnorm(1, meanlog = log(3), sdlog = 0.35))
-  #   return(list(dispatch_mode = "assigned", payload_kg = new_payload))
-  # }
-  # if (identical(event$event_type, "delivery_completed")) {
-  #   # Example of multi-variable update with stochastic decrement.
-  #   payload_now <- entity$state("payload_kg")
-  #   battery_now <- entity$state("battery_pct")
-  #   delivered_kg <- as.numeric(rlnorm(1, meanlog = log(1.2), sdlog = 0.45))
-  #   battery_drop <- as.numeric(rexp(1, rate = 1 / 6))
-  #   payload_next <- max(0, payload_now - delivered_kg)
-  #   battery_next <- max(0, battery_now - battery_drop)
-  #   return(list(
-  #     dispatch_mode = "completed",
-  #     payload_kg = payload_next,
-  #     battery_pct = battery_next
-  #   ))
-  # }
+  params <- if (is.list(ctx) && is.list(ctx$params)) ctx$params else list()
 
-  # Default scaffold behavior: no state changes.
+  param_num <- function(name, default) {
+    x <- params[[name]]
+    if (is.null(x) || length(x) != 1L) return(default)
+    x <- suppressWarnings(as.numeric(x))
+    if (!is.finite(x)) default else x
+  }
+
+  if (identical(event$event_type, "dispatch_check")) {
+    route_levels <- c("urban", "suburban", "rural")
+    route_probs <- params$route_zone_probs
+    if (is.null(route_probs) || !is.numeric(route_probs) || length(route_probs) != length(route_levels)) {
+      route_probs <- c(0.55, 0.30, 0.15)
+    }
+    route_probs <- pmax(route_probs, 0)
+    if (sum(route_probs) <= 0) route_probs <- c(0.55, 0.30, 0.15)
+    route_probs <- route_probs / sum(route_probs)
+
+    payload_mean <- max(0.1, param_num("dispatch_payload_mean_kg", 3.0))
+    payload_sdlog <- max(0.05, param_num("dispatch_payload_sdlog", 0.35))
+    battery_drop_mean <- max(0.1, param_num("dispatch_battery_drop_mean", 2.5))
+
+    s <- entity$as_list(c("battery_pct"))
+    battery_now <- as.numeric(s$battery_pct)
+    if (!is.finite(battery_now)) battery_now <- 100
+
+    new_payload <- as.numeric(stats::rlnorm(1, meanlog = log(payload_mean), sdlog = payload_sdlog))
+    battery_drop <- as.numeric(stats::rexp(1, rate = 1 / battery_drop_mean))
+    battery_next <- max(0, min(100, battery_now - battery_drop))
+
+    return(list(
+      route_zone = sample(route_levels, size = 1, prob = route_probs),
+      dispatch_mode = "assigned",
+      payload_kg = new_payload,
+      battery_pct = battery_next
+    ))
+  }
+
+  if (identical(event$event_type, "delivery_completed")) {
+    payload_sdlog <- max(0.05, param_num("delivery_payload_sdlog", 0.45))
+    delivery_mean <- max(0.1, param_num("delivery_payload_mean_kg", 1.2))
+    battery_drop_mean <- max(0.1, param_num("delivery_battery_drop_mean", 4.0))
+
+    s <- entity$as_list(c("payload_kg", "battery_pct"))
+    payload_now <- as.numeric(s$payload_kg)
+    battery_now <- as.numeric(s$battery_pct)
+    if (!is.finite(payload_now)) payload_now <- 0
+    if (!is.finite(battery_now)) battery_now <- 100
+
+    delivered_kg <- min(payload_now, as.numeric(stats::rlnorm(1, meanlog = log(delivery_mean), sdlog = payload_sdlog)))
+    payload_next <- max(0, payload_now - delivered_kg)
+    battery_drop <- as.numeric(stats::rexp(1, rate = 1 / battery_drop_mean))
+    battery_next <- max(0, battery_now - battery_drop)
+    mode_next <- if (payload_next > 0) "in_transit" else "completed"
+
+    return(list(
+      dispatch_mode = mode_next,
+      payload_kg = payload_next,
+      battery_pct = battery_next
+    ))
+  }
+
+  if (identical(event$event_type, "end_shift")) {
+    return(list(
+      dispatch_mode = "idle",
+      active_followup = FALSE
+    ))
+  }
+
   NULL
 }

@@ -9,7 +9,7 @@
 This template is intentionally simple:
 
 - each required function scaffold exists and runs with safe defaults
-- worked example logic is commented so you can fill it in safely
+- urban delivery worked-example logic is active and editable
 - comments explain what each function takes and must return
 
 ## Major framework components
@@ -24,6 +24,7 @@ A flux model package has a small number of structural pieces:
 - **Observation logic (optional)**: emits row-like outputs for analysis.
 - **Derived variables (optional)**: computed summaries of state/history at snapshot time.
 - **Bundle**: wires those functions into one object used by `fluxCore::Engine`.
+- **Refresh rules (optional)**: post-event scheduler hook selecting which process clocks to recompute.
 
 Template mapping:
 
@@ -35,6 +36,7 @@ Template mapping:
 - `R/06_observe_model.R` -> observation logic (optional)
 - `R/02_derived_vars_model.R` -> derived variables (optional)
 - `R/07_bundle_model.R` -> model bundle
+- `R/07_bundle_model.R` -> optional `refresh_rules(...)` targeting hook
 
 ## State variables vs derived variables
 
@@ -105,6 +107,14 @@ Example behavior:
 - `stop_model()` decides whether simulation should stop.
 - `observe_model()` optionally emits row-like output for analysis.
 
+Optional scheduler behavior:
+
+- Omit `refresh_rules(...)` and engine defaults to `"ALL"` refresh (safe path).
+- Add `refresh_rules(...)` only when you want targeted process refresh.
+- If implemented, return either:
+  - `"ALL"` (exact scalar), or
+  - character vector of unique `process_id` values.
+
 ## Build order
 
 Edit in this order:
@@ -119,12 +129,6 @@ Edit in this order:
 
 ## Why scripts contain live code
 
-The function shells are runnable on purpose (safe defaults) so the package can load/test immediately.
-Worked examples inside those shells are commented on purpose; uncomment/adapt them as you build your model.
-
-- `propose_events_model()` starts as `list()`
-- `transition_model()` starts as `NULL`
-- `stop_model()` starts as `FALSE` (unless you add a rule)
-- `observe_model()` starts as `NULL`
-
-That gives you a clean starting point while you replace placeholders with real model logic.
+The function shells are runnable on purpose so the package can load/test immediately and run a short simulation without edits.
+The urban delivery behavior is a teaching baseline, not a required design.
+Adapt or replace each function as you build your own model.

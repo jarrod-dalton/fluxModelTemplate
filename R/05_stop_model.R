@@ -19,10 +19,15 @@
 #   Keep stop_model() aligned with model_bundle()$terminal_events when possible.
 # ------------------------------------------------------------------------------
 stop_model <- function(entity, event, ctx) {
-  # Worked example (commented):
-  # if (identical(event$event_type, "end_shift")) return(TRUE)
-  # if (!is.null(ctx$time_horizon) && entity$last_time >= ctx$time_horizon) return(TRUE)
+  if (identical(event$event_type, "end_shift")) return(TRUE)
 
-  # Default scaffold behavior: keep running.
+  active_followup <- tryCatch(entity$state("active_followup"), error = function(e) TRUE)
+  if (isFALSE(active_followup)) return(TRUE)
+
+  if (is.list(ctx) && !is.null(ctx$time_horizon)) {
+    horizon <- suppressWarnings(as.numeric(ctx$time_horizon))
+    if (length(horizon) == 1L && is.finite(horizon) && entity$last_time >= horizon) return(TRUE)
+  }
+
   FALSE
 }

@@ -50,15 +50,16 @@ model_schema <- function() {
 
   # --------------------------------------------------------------------------
   # Worked example (urban food delivery): route context
+  #
+  # Replace/extend these variables to fit your domain model.
   # --------------------------------------------------------------------------
-  # schema$route_zone <- list(
-  #   type = "categorical",
-  #   levels = c("urban", "suburban", "rural"),
-  #   default = "urban",
-  #   coerce = as.character,
-  #   validate = function(x) length(x) == 1L && x %in% c("urban", "suburban", "rural"),
-  #   required = TRUE
-  # )
+  schema$route_zone <- list(
+    type = "categorical",
+    levels = c("urban", "suburban", "rural"),
+    default = "urban",
+    coerce = as.character,
+    validate = function(x) length(x) == 1L && x %in% c("urban", "suburban", "rural")
+  )
 
   # --------------------------------------------------------------------------
   # Worked example (urban food delivery): grouped vehicle state
@@ -66,34 +67,34 @@ model_schema <- function() {
   # battery_pct and payload_kg share block "vehicle_status" so they can be
   # updated together with update_block(...) inside transition_model().
   # --------------------------------------------------------------------------
-  # schema$battery_pct <- list(
-  #   type = "continuous",
-  #   default = 100,
-  #   coerce = as.numeric,
-  #   validate = function(x) length(x) == 1L && is.finite(x) && x >= 0 && x <= 100,
-  #   blocks = "vehicle_status"
-  # )
-  #
-  # schema$payload_kg <- list(
-  #   type = "continuous",
-  #   default = 0,
-  #   coerce = as.numeric,
-  #   validate = function(x) length(x) == 1L && is.finite(x) && x >= 0,
-  #   blocks = "vehicle_status"
-  # )
+  schema$battery_pct <- list(
+    type = "continuous",
+    default = 100,
+    coerce = as.numeric,
+    validate = function(x) length(x) == 1L && is.finite(x) && x >= 0 && x <= 100,
+    blocks = "vehicle_status"
+  )
+
+  schema$payload_kg <- list(
+    type = "continuous",
+    default = 0,
+    coerce = as.numeric,
+    validate = function(x) length(x) == 1L && is.finite(x) && x >= 0,
+    blocks = "vehicle_status"
+  )
 
   # --------------------------------------------------------------------------
   # Worked example (urban food delivery): workflow mode
   # --------------------------------------------------------------------------
-  # schema$dispatch_mode <- list(
-  #   type = "ordinal",
-  #   levels = c("idle", "assigned", "in_transit", "completed"),
-  #   default = "idle",
-  #   coerce = as.character,
-  #   validate = function(x) {
-  #     length(x) == 1L && x %in% c("idle", "assigned", "in_transit", "completed")
-  #   }
-  # )
+  schema$dispatch_mode <- list(
+    type = "categorical",
+    levels = c("idle", "assigned", "in_transit", "completed"),
+    default = "idle",
+    coerce = as.character,
+    validate = function(x) {
+      length(x) == 1L && x %in% c("idle", "assigned", "in_transit", "completed")
+    }
+  )
 
   schema
 }

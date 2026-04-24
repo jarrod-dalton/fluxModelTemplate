@@ -33,68 +33,60 @@
 #   3) Return list(name = function, ...).
 # ------------------------------------------------------------------------------
 derived_vars_model <- function(params = list()) {
+  cutoff <- if (!is.null(params$low_battery_cutoff)) as.numeric(params$low_battery_cutoff) else 20
+
   # --------------------------------------------------------------------------
   # Worked example: low battery flag from current state
   # --------------------------------------------------------------------------
-  # low_battery <- function(entity, j, t) {
-  #   cutoff <- if (!is.null(params$low_battery_cutoff)) params$low_battery_cutoff else 20
-  #   b <- entity$state("battery_pct")
-  #   if (is.null(b) || is.na(b)) return(NA)
-  #   b < cutoff
-  # }
+  low_battery <- function(entity, j, t) {
+    b <- tryCatch(as.numeric(entity$state("battery_pct")), error = function(e) NA_real_)
+    if (!is.finite(b)) return(NA)
+    b < cutoff
+  }
 
   # --------------------------------------------------------------------------
   # Worked example: count deliveries observed by event index/time
-  #
-  # This example is intentionally simple and assumes event log has columns such
-  # as event_type and time. Adapt to your event log schema.
   # --------------------------------------------------------------------------
-  # deliveries_completed <- function(entity, j, t) {
-  #   ev <- entity$events
-  #   if (is.null(ev) || nrow(ev) == 0L) return(0L)
-  #   if (!all(c("event_type", "time") %in% names(ev))) return(0L)
-  #   sum(ev$event_type == "delivery_completed" & ev$time <= t, na.rm = TRUE)
-  # }
+  deliveries_completed <- function(entity, j, t) {
+    ev <- entity$events
+    if (is.null(ev) || nrow(ev) == 0L) return(0L)
+    if (!all(c("j", "time", "event_type") %in% names(ev))) return(0L)
+    as.integer(sum(ev$event_type == "delivery_completed" & ev$j <= j & ev$time <= t, na.rm = TRUE))
+  }
 
   # --------------------------------------------------------------------------
   # Worked example: deliveries in the last 4 hours
   #
   # Assumes model time unit is "hours".
-  # deliveries_last_4h returns count of delivery_completed events in (t - 4, t].
-  #
-  # Why filter on BOTH ev$j <= j and ev$time <= t?
-  # - ev$time <= t enforces the time window.
-  # - ev$j <= j enforces event-order consistency when multiple events share
-  #   the same timestamp. Without the j filter, an event at the same time but
-  #   with later index could leak into a snapshot anchored at earlier j.
   # --------------------------------------------------------------------------
-  # deliveries_last_4h <- function(entity, j, t) {
-  #   ev <- entity$events
-  #   if (is.null(ev) || nrow(ev) == 0L) return(0L)
-  #   if (!all(c("j", "time", "event_type") %in% names(ev))) return(0L)
-  #
-  #   in_window <- ev$event_type == "delivery_completed" &
-  #     ev$j <= j &
-  #     ev$time > (t - 4) &
-  #     ev$time <= t
-  #
-  #   as.integer(sum(in_window, na.rm = TRUE))
-  # }
+  deliveries_last_4h <- function(entity, j, t) {
+    ev <- entity$events
+    if (is.null(ev) || nrow(ev) == 0L) return(0L)
+    if (!all(c("j", "time", "event_type") %in% names(ev))) return(0L)
+
+    in_window <- ev$event_type == "delivery_completed" &
+      ev$j <= j &
+      ev$time > (t - 4) &
+      ev$time <= t
+
+    as.integer(sum(in_window, na.rm = TRUE))
+  }
 
   # --------------------------------------------------------------------------
   # Worked example: most recent route zone by event index (j-based)
-  #
-  # This example uses j directly (not a time window) and returns the route_zone
-  # value as of event index j.
   # --------------------------------------------------------------------------
-  # last_route_zone <- function(entity, j, t) {
-  #   h <- entity$hist$route_zone
-  #   if (is.null(h) || length(h$j) == 0L) return(NA_character_)
-  #   idx <- findInterval(j, h$j)
-  #   if (idx <= 0L) return(NA_character_)
-  #   as.character(h$v[[idx]])
-  # }
+  last_route_zone <- function(entity, j, t) {
+    h <- entity$hist$route_zone
+    if (is.null(h) || length(h$j) == 0L) return(NA_character_)
+    idx <- findInterval(j, h$j)
+    if (idx <= 0L) return(NA_character_)
+    as.character(h$v[[idx]])
+  }
 
-  # Return empty list until you add derived variables.
-  list()
+  list(
+    low_battery = low_battery,
+    deliveries_completed = deliveries_completed,
+    deliveries_last_4h = deliveries_last_4h,
+    last_route_zone = last_route_zone
+  )
 }
