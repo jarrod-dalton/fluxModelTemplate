@@ -1,4 +1,8 @@
 # fluxModelTemplate
+[![Release](https://img.shields.io/github/v/release/jarrod-dalton/fluxModelTemplate?display_name=tag)](https://github.com/jarrod-dalton/fluxModelTemplate/releases)
+[![Downloads](https://img.shields.io/github/downloads/jarrod-dalton/fluxModelTemplate/total)](https://github.com/jarrod-dalton/fluxModelTemplate/releases)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Language: R](https://img.shields.io/badge/language-R-276DC3?logo=r&logoColor=white)](https://www.r-project.org/)
 
 `fluxModelTemplate` is a starter scaffold for building a new model package on top of `fluxCore`.
 
