@@ -14,6 +14,7 @@ A flux model package has a small number of structural pieces:
 
 - **State schema**: defines core variables that represent the evolving system state.
 - **Event proposal**: proposes future candidate events on one or more processes.
+- **Event organization**: declares allowed event labels and terminal endpoint set.
 - **Transition logic**: updates core state when an event is realized.
 - **Stop logic**: decides when simulation ends.
 - **Observation logic (optional)**: emits row-like outputs for analysis.
@@ -24,6 +25,7 @@ Template mapping:
 
 - `R/01_schema_model.R` -> state schema
 - `R/03_propose_events_model.R` -> event proposal
+- `R/07_bundle_model.R` -> event catalog + terminal endpoint declaration
 - `R/04_transition_model.R` -> transition logic
 - `R/05_stop_model.R` -> stop logic
 - `R/06_observe_model.R` -> observation logic (optional)
@@ -36,6 +38,16 @@ Template mapping:
 - **Derived variables** are computed views of state/history. They are not written by transitions; they are functions evaluated at snapshot time.
 
 In short: transitions mutate core state; derived functions summarize it.
+
+## Lifecycle semantics (practical default)
+
+Forecast/summary tools construct lifecycle eligibility in this order:
+
+1. Use modeled `alive` if your schema includes it.
+2. Else, derive lifecycle from first occurrence of `terminal_events` declared in the bundle.
+3. Else, fallback to lifecycle-active wherever runs are defined.
+
+For most models, declare `event_catalog` and `terminal_events` in `model_bundle()` even if you also keep `alive`.
 
 ## Event index `j` vs time `t`
 
@@ -84,6 +96,7 @@ Example event types:
 Example behavior:
 
 - `propose_events_model()` proposes candidate future events.
+- `model_bundle()` declares `event_catalog` and `terminal_events`.
 - `transition_model()` applies state updates when an event occurs.
 - `stop_model()` decides whether simulation should stop.
 - `observe_model()` optionally emits row-like output for analysis.

@@ -14,7 +14,11 @@
 #   Each candidate should contain at least:
 #     - time_next: numeric event time t_next
 #     - event_type: string label handled by transition/stop/observe logic
-#     - process_id: process label (used to distinguish event streams)
+#
+#   IMPORTANT CONTRACT
+#     - The returned list itself is keyed by process_id (names(out)).
+#     - Each list name must be non-empty and unique.
+#     - event_type labels should be declared in model_bundle()$event_catalog.
 #
 # EVENT INDEX AND TIME
 #   This function proposes candidates for the *next* event index (j + 1), but
@@ -50,14 +54,13 @@ propose_events_model <- function(entity, ctx) {
   #
   # ev_dispatch <- list(
   #   time_next = t_now + wait_dispatch,
-  #   event_type = "dispatch_check",
-  #   process_id = "dispatch"
+  #   event_type = "dispatch_check"
   # )
   # ev_delivery <- list(
   #   time_next = t_now + wait_delivery,
-  #   event_type = "delivery_completed",
-  #   process_id = "delivery"
+  #   event_type = "delivery_completed"
   # )
+  # # process ids come from list names ("dispatch", "delivery")
   # list(dispatch = ev_dispatch, delivery = ev_delivery)
 
   # Default scaffold behavior: no candidates.

@@ -16,6 +16,7 @@
 #   Add explicit stopping rules, for example:
 #   - terminal event encountered
 #   - horizon reached (time-based stop)
+#   Keep stop_model() aligned with model_bundle()$terminal_events when possible.
 # ------------------------------------------------------------------------------
 stop_model <- function(entity, event, ctx) {
   # Worked example (commented):

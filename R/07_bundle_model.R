@@ -15,6 +15,16 @@
 # OUTPUT
 #   A named list with hook functions and optional defaults.
 #
+# EVENT ORGANIZATION (recommended)
+#   Include:
+#     - event_catalog: all allowed event_type labels in the model
+#     - terminal_events: subset of event_catalog treated as terminal endpoints
+#
+#   Lifecycle behavior in downstream forecast tools:
+#     - if schema defines `alive`, that is authoritative
+#     - else if terminal_events declared, lifecycle is derived from first terminal event
+#     - else lifecycle defaults to active while runs are defined
+#
 # RUNTIME CALL ORDER (mental model)
 #   For each entity in Engine$run():
 #     1) init_entity(entity, ctx)            # optional one-time setup
@@ -65,6 +75,8 @@ model_bundle <- function(
   list(
     params = params,                         # default model parameters
     time_spec = bundle_time_spec,            # canonical model time declaration
+    event_catalog = c("dispatch_check", "delivery_completed", "end_shift"),
+    terminal_events = "end_shift",
     init_entity = init_entity,               # optional one-time setup
     propose_events = propose_events_model,   # required
     transition = transition_model,           # required
