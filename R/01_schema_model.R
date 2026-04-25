@@ -19,17 +19,6 @@
 #   A named list. Each entry defines one variable, and together they define
 #   your full set of core state variables.
 #
-# ABOUT fluxCore::default_entity_schema()
-#   This provides a minimal base schema from Core so every new model starts from
-#   a valid foundation (for example, canonical fields like alive status).
-#   You then add model-specific variables on top.
-#
-# ALIVE FIELD NOTE
-#   `alive` is optional in newer flux workflows:
-#   - If included in schema, it is used directly for lifecycle eligibility.
-#   - If omitted, lifecycle can be derived from bundle$terminal_events.
-#   - If both are omitted, lifecycle defaults to active while runs are defined.
-#
 # VARIABLE DEFINITION SHAPE
 #   schema$var_name <- list(
 #     type = "continuous",  # one of: binary/categorical/ordinal/continuous/count
@@ -41,12 +30,12 @@
 #   )
 #
 # WHAT TO EDIT
-#   1) Keep `schema <- fluxCore::default_entity_schema()`.
+#   1) Start from an explicit schema list.
 #   2) Add your variables below.
 #   3) Use strict validation to catch invalid inputs early.
 # ------------------------------------------------------------------------------
 model_schema <- function() {
-  schema <- fluxCore::default_entity_schema()
+  schema <- list()
 
   # --------------------------------------------------------------------------
   # Worked example (urban food delivery): route context

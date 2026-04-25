@@ -22,7 +22,7 @@ observe_model <- function(entity, event, ctx) {
   # Emit one observation row per event by default; trim fields as needed.
   snap <- entity$snapshot(vars = c(
     "route_zone", "battery_pct", "payload_kg",
-    "dispatch_mode", "active_followup", "alive"
+    "dispatch_mode"
   ))
 
   data.frame(
@@ -33,8 +33,6 @@ observe_model <- function(entity, event, ctx) {
     battery_pct = as.numeric(snap$battery_pct),
     payload_kg = as.numeric(snap$payload_kg),
     dispatch_mode = as.character(snap$dispatch_mode),
-    active_followup = as.logical(snap$active_followup),
-    alive = as.logical(snap$alive),
     stringsAsFactors = FALSE
   )
 }

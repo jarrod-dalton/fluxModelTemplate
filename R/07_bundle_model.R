@@ -21,8 +21,7 @@
 #     - terminal_events: subset of event_catalog treated as terminal endpoints
 #
 #   Lifecycle behavior in downstream forecast tools:
-#     - if schema defines `alive`, that is authoritative
-#     - else if terminal_events declared, lifecycle is derived from first terminal event
+#     - if terminal_events declared, lifecycle is derived from first terminal event
 #     - else lifecycle defaults to active while runs are defined
 #
 # RUNTIME CALL ORDER (mental model)
@@ -38,7 +37,7 @@
 #
 # WHY init_entity EXISTS
 #   init_entity is for per-run setup, not baseline state input.
-#   Baseline state values come from Entity$new(..., init = ...) / new_entity(...).
+#   Baseline state values come from Entity$new(..., init = ...).
 #   Common init_entity use: register derived variables once before event loop.
 #
 # OPTIONAL refresh_rules

@@ -90,8 +90,7 @@ transition_model <- function(entity, event, ctx) {
 
   if (identical(event$event_type, "end_shift")) {
     return(list(
-      dispatch_mode = "idle",
-      active_followup = FALSE
+      dispatch_mode = "idle"
     ))
   }
 

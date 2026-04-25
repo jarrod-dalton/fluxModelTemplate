@@ -21,9 +21,6 @@
 stop_model <- function(entity, event, ctx) {
   if (identical(event$event_type, "end_shift")) return(TRUE)
 
-  active_followup <- tryCatch(entity$state("active_followup"), error = function(e) TRUE)
-  if (isFALSE(active_followup)) return(TRUE)
-
   if (is.list(ctx) && !is.null(ctx$time_horizon)) {
     horizon <- suppressWarnings(as.numeric(ctx$time_horizon))
     if (length(horizon) == 1L && is.finite(horizon) && entity$last_time >= horizon) return(TRUE)

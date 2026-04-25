@@ -1,3 +1,10 @@
+## 1.9.0
+
+- Coordinated ecosystem release alignment to version 1.9.0.
+- Updated instructional scripts to avoid hard-wiring `alive`/`active_followup` into the urban delivery starter schema and observation paths.
+- Clarified bundle guidance for terminal-event-driven lifecycle semantics and explicit `Entity$new()` initialization.
+- Dependency floor updated to `fluxCore (>= 1.9.0)`.
+
 ## 1.8.1
 
 - Converted staged template scripts into runnable defaults while preserving

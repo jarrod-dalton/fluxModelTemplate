@@ -1,7 +1,7 @@
 Package: fluxModelTemplate
 Type: Package
 Title: Template Package for fluxCore Models
-Version: 1.8.1
+Version: 1.9.0
 Author: Jarrod Dalton [aut, cre]
 Maintainer: Jarrod Dalton <daltonj@ccf.org>
 Authors@R: person(given = "Jarrod",
@@ -14,7 +14,7 @@ Description:
     This package is intended to be copied/renamed; it includes
     placeholder shells and a short guide pointing to fluxCore.
 Imports:
-    fluxCore (>= 1.8.1),
+    fluxCore (>= 1.9.0),
     jsonlite
 License: Apache License (== 2.0)
 Encoding: UTF-8

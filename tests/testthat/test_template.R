@@ -13,7 +13,6 @@ test_that("model_time_spec reads canonical JSON config", {
 test_that("model_schema returns a default-compatible schema with worked-example vars", {
   schema <- model_schema()
   expect_true(is.list(schema))
-  expect_true("alive" %in% names(schema))
   expect_true(all(c("route_zone", "battery_pct", "payload_kg", "dispatch_mode") %in% names(schema)))
 })
 
@@ -32,7 +31,7 @@ test_that("model_bundle exposes required hooks and optional refresh_rules remain
 })
 
 test_that("propose_events_model returns named process proposals and supports process_ids filtering", {
-  e <- fluxCore::new_entity(
+  e <- fluxCore::Entity$new(
     init = list(),
     schema = model_schema(),
     entity_type = "agent",
@@ -56,7 +55,7 @@ test_that("default bundle run path works end-to-end without overrides", {
   b <- model_bundle(params = list(shift_end_time = 2))
   prov <- list(load = function(model_spec, ...) b)
   eng <- fluxCore::Engine$new(provider = prov, model_spec = list(name = "default"))
-  e <- fluxCore::new_entity(
+  e <- fluxCore::Entity$new(
     init = list(),
     schema = model_schema(),
     entity_type = "agent",
@@ -72,8 +71,7 @@ test_that("default bundle run path works end-to-end without overrides", {
   expect_true(is.data.frame(out$observations))
   expect_true(all(c(
     "time", "event_type", "process_id", "route_zone",
-    "battery_pct", "payload_kg", "dispatch_mode",
-    "active_followup", "alive"
+    "battery_pct", "payload_kg", "dispatch_mode"
   ) %in% names(out$observations)))
 
   snap <- out$entity$snapshot()
@@ -84,7 +82,7 @@ test_that("default bundle run path works end-to-end without overrides", {
 })
 
 test_that("transition_model and stop_model handle end_shift terminal behavior", {
-  e <- fluxCore::new_entity(
+  e <- fluxCore::Entity$new(
     init = list(),
     schema = model_schema(),
     entity_type = "agent",
@@ -93,7 +91,6 @@ test_that("transition_model and stop_model handle end_shift terminal behavior", 
 
   ch <- transition_model(e, event = list(event_type = "end_shift"), ctx = list(params = list()))
   expect_true(is.list(ch))
-  expect_identical(ch$active_followup, FALSE)
   expect_identical(ch$dispatch_mode, "idle")
 
   e$update(time = 1, event_type = "end_shift", changes = ch)
