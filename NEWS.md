@@ -1,3 +1,9 @@
+## 1.10.0
+
+- Coordinated ecosystem release alignment to version 1.10.0.
+- Updated schema examples to demonstrate new type system and `set_schema()` helper function.
+- Dependency floor updated to `fluxCore (>= 1.10.0)`.
+
 ## 1.9.0
 
 - Coordinated ecosystem release alignment to version 1.9.0.
