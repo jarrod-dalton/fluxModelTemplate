@@ -4,12 +4,12 @@
 - Updated schema examples to demonstrate new type system and `set_schema()` helper function.
 - Dependency floor updated to `fluxCore (>= 1.10.0)`.
 
-## 1.9.0
+## 1.10.0
 
-- Coordinated ecosystem release alignment to version 1.9.0.
+- Coordinated ecosystem release alignment to version 1.10.0.
 - Updated instructional scripts to avoid hard-wiring `alive`/`active_followup` into the urban delivery starter schema and observation paths.
 - Clarified bundle guidance for terminal-event-driven lifecycle semantics and explicit `Entity$new()` initialization.
-- Dependency floor updated to `fluxCore (>= 1.9.0)`.
+- Dependency floor updated to `fluxCore (>= 1.10.0)`.
 
 ## 1.8.1
 

@@ -57,7 +57,7 @@ model_schema <- function() {
   # updated together with update_block(...) inside transition_model().
   # --------------------------------------------------------------------------
   schema$battery_pct <- list(
-    type = "continuous",
+    type = "numeric",
     default = 100,
     coerce = as.numeric,
     validate = function(x) length(x) == 1L && is.finite(x) && x >= 0 && x <= 100,
@@ -65,7 +65,7 @@ model_schema <- function() {
   )
 
   schema$payload_kg <- list(
-    type = "continuous",
+    type = "numeric",
     default = 0,
     coerce = as.numeric,
     validate = function(x) length(x) == 1L && is.finite(x) && x >= 0,
