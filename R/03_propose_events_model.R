@@ -1,12 +1,12 @@
 # ------------------------------------------------------------------------------
-# propose_events_model(entity, ctx, process_ids = NULL, current_proposals = NULL)
+# propose_events_model(entity, param_ctx = NULL, process_ids = NULL, current_proposals = NULL)
 #
 # PURPOSE
 #   Propose candidate future events for the current state.
 #
 # INPUTS
 #   entity: current entity object (for example entity$last_time, entity$state(...)).
-#   ctx: run context list (optional settings/parameters/time controls).
+#   param_ctx: parameter context (optional); param_ctx$params for model parameters.
 #
 # OUTPUT
 #   Named list of candidate event objects.
@@ -36,8 +36,8 @@
 #   where lambda can come from a model-based hazard/rate (for example a GLM-like
 #   predictor mapped through exp()).
 # ------------------------------------------------------------------------------
-propose_events_model <- function(entity, ctx, process_ids = NULL, current_proposals = NULL) {
-  params <- if (is.list(ctx) && is.list(ctx$params)) ctx$params else list()
+propose_events_model <- function(entity, param_ctx = NULL, process_ids = NULL, current_proposals = NULL) {
+  params <- if (is.list(param_ctx) && is.list(param_ctx$params)) param_ctx$params else list()
 
   param_num <- function(name, default) {
     x <- params[[name]]

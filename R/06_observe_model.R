@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# observe_model(entity, event, ctx)
+# observe_model(entity, event)
 #
 # PURPOSE
 #   Optionally emit one row-like output after an event is processed.
@@ -7,7 +7,6 @@
 # INPUTS
 #   entity: current entity object.
 #   event: realized event.
-#   ctx: run context list.
 #
 # OUTPUT
 #   Either:
@@ -18,7 +17,7 @@
 #   1) Decide which events produce observations.
 #   2) Build one row using state/snapshot/event fields.
 # ------------------------------------------------------------------------------
-observe_model <- function(entity, event, ctx) {
+observe_model <- function(entity, event) {
   # Emit one observation row per event by default; trim fields as needed.
   snap <- entity$snapshot(vars = c(
     "route_zone", "battery_pct", "payload_kg",

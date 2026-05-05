@@ -26,13 +26,13 @@
 #
 # RUNTIME CALL ORDER (mental model)
 #   For each entity in Engine$run():
-#     1) init_entity(entity, ctx)            # optional one-time setup
-#     2) propose_events(entity, ctx, ...)    # propose candidate next events
-#     3) transition(entity, event, ctx)      # return state updates
-#     4) entity$update(...)                  # Core applies updates internally
-#     5) observe(entity, event, ctx)         # optional output row
-#     6) stop(entity, event, ctx)            # stop/continue decision
-#     7) refresh_rules(...)                  # optional process refresh selection
+#     1) init_entity(entity)                  # optional one-time setup
+#     2) propose_events(entity, ...)          # propose candidate next events
+#     3) transition(entity, event)            # return state updates
+#     4) entity$update(...)                   # Core applies updates internally
+#     5) observe(entity, event)               # optional output row
+#     6) stop(entity, event)                  # stop/continue decision
+#     7) refresh_rules(...)                   # optional process refresh selection
 #     8) loop until stop/max_events/max_time
 #
 # WHY init_entity EXISTS
@@ -41,7 +41,7 @@
 #   Common init_entity use: register derived variables once before event loop.
 #
 # OPTIONAL refresh_rules
-#   You may provide refresh_rules(entity, last_event, changes, ctx) to refresh only
+#   You may provide refresh_rules(entity, last_event, changes) to refresh only
 #   selected process clocks after each realized event.
 #   If refresh_rules is omitted, fluxCore defaults to "ALL" (refresh all process clocks).
 #   If implemented, return:
@@ -50,7 +50,9 @@
 #
 # ABOUT params IN THE BUNDLE
 #   params is stored on the bundle so model defaults are available during runs.
-#   Core can propagate bundle$params into ctx$params if ctx$params is missing.
+#   Core stores bundle$params and makes them available as param_ctx$params
+#   during runs. Bundle callbacks that declare a `param_ctx` formal receive
+#   the ParamContext automatically.
 #
 # WHY time_spec IS INCLUDED IN THE BUNDLE
 #   Even when canonical time is defined centrally (for example in JSON),
@@ -91,7 +93,7 @@ model_bundle <- function(
 
   params <- utils::modifyList(default_params, params)
 
-  init_entity <- function(entity, ctx) {
+  init_entity <- function(entity) {
     # Example setup: register derived variable functions once per entity/run.
     dv <- derived_vars_model(params)
     if (!is.null(dv) && length(dv) > 0L) {
@@ -101,7 +103,7 @@ model_bundle <- function(
   }
 
   # Optional advanced hook:
-  # refresh_rules <- function(entity, last_event, changes, ctx) {
+  # refresh_rules <- function(entity, last_event, changes) {
   #   # Safe fallback:
   #   # return("ALL")
   #   #

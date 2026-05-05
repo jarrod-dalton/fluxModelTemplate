@@ -37,14 +37,14 @@ test_that("propose_events_model returns named process proposals and supports pro
     entity_type = "agent",
     time0 = 0
   )
-  out_all <- propose_events_model(e, ctx = list(params = list(shift_end_time = 2)))
+  out_all <- propose_events_model(e, param_ctx = list(params = list(shift_end_time = 2)))
   expect_true(is.list(out_all))
   expect_true(all(c("dispatch", "delivery", "end_shift") %in% names(out_all)))
   expect_true(all(vapply(out_all, function(x) is.list(x) && is.numeric(x$time_next), logical(1))))
 
   out_subset <- propose_events_model(
     e,
-    ctx = list(params = list(shift_end_time = 2)),
+    param_ctx = list(params = list(shift_end_time = 2)),
     process_ids = c("dispatch", "end_shift")
   )
   expect_setequal(names(out_subset), c("dispatch", "end_shift"))
@@ -53,8 +53,7 @@ test_that("propose_events_model returns named process proposals and supports pro
 test_that("default bundle run path works end-to-end without overrides", {
   set.seed(42)
   b <- model_bundle(params = list(shift_end_time = 2))
-  prov <- list(load = function(model_spec, ...) b)
-  eng <- fluxCore::Engine$new(provider = prov, model_spec = list(name = "default"))
+  eng <- fluxCore::Engine$new(bundle = b)
   e <- fluxCore::Entity$new(
     init = list(),
     schema = model_schema(),
@@ -89,10 +88,10 @@ test_that("transition_model and stop_model handle end_shift terminal behavior", 
     time0 = 0
   )
 
-  ch <- transition_model(e, event = list(event_type = "end_shift"), ctx = list(params = list()))
+  ch <- transition_model(e, event = list(event_type = "end_shift"), param_ctx = list(params = list()))
   expect_true(is.list(ch))
   expect_identical(ch$dispatch_mode, "idle")
 
   e$update(time = 1, event_type = "end_shift", changes = ch)
-  expect_true(stop_model(e, event = list(event_type = "end_shift"), ctx = list()))
+  expect_true(stop_model(e, event = list(event_type = "end_shift")))
 })

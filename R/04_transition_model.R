@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# transition_model(entity, event, ctx)
+# transition_model(entity, event, param_ctx = NULL)
 #
 # PURPOSE
 #   Apply state updates for a realized event.
@@ -7,7 +7,7 @@
 # INPUTS
 #   entity: current entity object.
 #   event: realized event (typically includes event_type, process_id, time_next).
-#   ctx: run context list.
+#   param_ctx: parameter context (optional); param_ctx$params for model parameters.
 #
 # OUTPUT
 #   Either:
@@ -24,8 +24,8 @@
 #   2) Compute updates (possibly with update_block/combine_updates).
 #   3) Return named update list (or NULL).
 # ------------------------------------------------------------------------------
-transition_model <- function(entity, event, ctx) {
-  params <- if (is.list(ctx) && is.list(ctx$params)) ctx$params else list()
+transition_model <- function(entity, event, param_ctx = NULL) {
+  params <- if (is.list(param_ctx) && is.list(param_ctx$params)) param_ctx$params else list()
 
   param_num <- function(name, default) {
     x <- params[[name]]
