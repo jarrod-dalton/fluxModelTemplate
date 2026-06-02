@@ -1,3 +1,11 @@
+## fluxModelTemplate 2.0.0
+
+- Ecosystem alignment to fluxCore 2.0.0.
+- Dependency floor updated to `fluxCore (>= 2.0.0)`.
+- Template scaffolding updated to reflect v2.0 context signatures: bundle
+  callback stubs now show `param_ctx = NULL` and `sim_ctx = NULL` optional
+  arguments and include guidance on when to use each.
+
 ## 1.10.0
 
 - Coordinated ecosystem release alignment to version 1.10.0.
