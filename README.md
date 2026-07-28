@@ -1,6 +1,5 @@
 # fluxModelTemplate
 [![Release](https://img.shields.io/github/v/release/jarrod-dalton/fluxModelTemplate?display_name=tag)](https://github.com/jarrod-dalton/fluxModelTemplate/releases)
-[![r-universe](https://jarrod-dalton.r-universe.dev/badges/fluxModelTemplate)](https://jarrod-dalton.r-universe.dev/fluxModelTemplate)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Language: R](https://img.shields.io/badge/language-R-276DC3?logo=r&logoColor=white)](https://www.r-project.org/)
 
@@ -14,11 +13,9 @@ This template is intentionally simple:
 
 ## Installation
 
-```r
-# Latest stable release (recommended):
-install.packages("fluxModelTemplate", repos = "https://jarrod-dalton.r-universe.dev")
+Install the latest source version from GitHub:
 
-# Pre-release install from source code:
+```r
 remotes::install_github("jarrod-dalton/fluxModelTemplate")
 ```
 
