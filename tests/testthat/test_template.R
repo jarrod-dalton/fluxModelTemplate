@@ -37,14 +37,18 @@ test_that("propose_events_model returns named process proposals and supports pro
     entity_type = "agent",
     time0 = 0
   )
-  out_all <- propose_events_model(e, param_ctx = list(params = list(shift_end_time = 2)))
+  param_ctx <- fluxCore::ParamContext(
+    draw_id = 1L,
+    params = list(shift_end_time = 2)
+  )
+  out_all <- propose_events_model(e, param_ctx = param_ctx)
   expect_true(is.list(out_all))
   expect_true(all(c("dispatch", "delivery", "end_shift") %in% names(out_all)))
   expect_true(all(vapply(out_all, function(x) is.list(x) && is.numeric(x$time_next), logical(1))))
 
   out_subset <- propose_events_model(
     e,
-    param_ctx = list(params = list(shift_end_time = 2)),
+    param_ctx = param_ctx,
     process_ids = c("dispatch", "end_shift")
   )
   expect_setequal(names(out_subset), c("dispatch", "end_shift"))
@@ -88,7 +92,8 @@ test_that("transition_model and stop_model handle end_shift terminal behavior", 
     time0 = 0
   )
 
-  ch <- transition_model(e, event = list(event_type = "end_shift"), param_ctx = list(params = list()))
+  param_ctx <- fluxCore::ParamContext(draw_id = 1L, params = list())
+  ch <- transition_model(e, event = list(event_type = "end_shift"), param_ctx = param_ctx)
   expect_true(is.list(ch))
   expect_identical(ch$dispatch_mode, "idle")
 

@@ -1,3 +1,11 @@
+## fluxModelTemplate 2.1.0
+
+- Direct callback tests now use real `fluxCore::ParamContext` objects and read
+  model parameters through `param_ctx$params`, matching the Core 2.1 boundary.
+- Restored package documentation for the three exported template entry points
+  and excluded the submodule Git marker from source builds; runtime template
+  behavior is unchanged.
+
 ## fluxModelTemplate 2.0.0
 
 - Ecosystem alignment to fluxCore 2.0.0.
